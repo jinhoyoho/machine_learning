@@ -52,4 +52,3 @@ myclf.fit(X_train, y_train)
 
 mypredictions = myclf.predict(X_test)
 print("Dummy Classifier의 정확도는: {0:.4f}".format(accuracy_score(y_test, mypredictions)))
-
