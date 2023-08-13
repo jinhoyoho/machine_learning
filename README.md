@@ -5,3 +5,6 @@
 아래 블로그에서 공부한 내용을 확인하실 수 있습니다.
 
 https://velog.io/@jinhoyoho
+
+conda create -n ml -y
+conda activate ml

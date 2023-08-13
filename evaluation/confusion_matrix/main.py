@@ -8,8 +8,9 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import Binarizer
-from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import precision_recall_curve, roc_curve, roc_auc_score
 from eval import get_clf_eval
+from roc_curve_plot import roc_curve_plot
 
 # NULL 처리 함수
 def fillna(df):
@@ -56,12 +57,15 @@ lr_clf = LogisticRegression()
 
 lr_clf.fit(X_train, y_train) # 학습
 pred = lr_clf.predict(X_test) # 예측
-get_clf_eval(y_test, pred) # 평가
 
-pred_proba = lr_clf.predict_proba(X_test) # 개별 데이터별 예측 확률 반환
+pred_proba = lr_clf.predict_proba(X_test)[:, 1] # 개별 데이터별 예측 확률 반환
+
+get_clf_eval(y_test, pred, pred_proba) # 평가
 
 print("pred_proba() result shape: ", pred_proba.shape)
 print("Just three sample pred_proba array: ", pred_proba[:3])
+
+pred_proba = lr_clf.predict_proba(X_test) # 개별 데이터별 예측 확률 반환
 pred_proba_result = np.concatenate([pred_proba, pred.reshape(-1, 1)], axis=1) # 열에 추가
 print('greater probability predict class value of two classes: ', pred_proba_result[:3])
 
@@ -102,3 +106,17 @@ plt.ylabel('Precision and Recall value')
 plt.legend()
 plt.grid()
 plt.show()
+
+fprs, tprs, threshold = roc_curve(y_test, pred_proba_class1)
+thr_index = np.arange(1, threshold.shape[0], 5)
+print("threshold array's index for extracting sample: ", thr_index)
+print("threshold value extracting sample index: ", np.round(threshold[thr_index], 2))
+
+print("FPR value each sample threshold: ", np.round(fprs[thr_index], 3))
+print("TPR value each sample threshold: ", np.round(tprs[thr_index], 3))
+
+roc_curve_plot(y_test, pred_proba[:, 1])
+
+pred_proba = lr_clf.predict_proba(X_test)[:, 1] # 개별 데이터별 예측 확률 반환
+roc_score = roc_auc_score(y_test, pred_proba)
+print(f"ROC AUC value: {roc_score}")
